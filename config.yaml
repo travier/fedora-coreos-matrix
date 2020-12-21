@@ -39,11 +39,13 @@ systemd:
         [Service]
         ExecStart=/bin/podman run --name=postgres \
                                   --pull=always  \
+                                  --read-only \
                                   --net=host \
                                   -e POSTGRES_USER=synapse \
                                   -e POSTGRES_DB=synapse \
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
                                   -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
+                                  -v /var/srv:/var/lib/postgresql/data:z \
                                   docker.io/library/postgres:13
         ExecStop=/bin/podman rm -f postgres
 
