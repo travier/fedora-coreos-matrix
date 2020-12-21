@@ -28,3 +28,24 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: postgres.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the database service for matrix
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        ExecStart=/bin/podman run --name=postgres \
+                                  --pull=always  \
+                                  --net=host \
+                                  -e POSTGRES_USER=synapse \
+                                  -e POSTGRES_DB=synapse \
+                                  -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
+                                  -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
+                                  docker.io/library/postgres:13
+        ExecStop=/bin/podman rm -f postgres
+
+        [Install]
+        WantedBy=multi-user.target
