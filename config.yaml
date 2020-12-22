@@ -159,6 +159,26 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: element-web.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the element-web container
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        ExecStart=/bin/podman run --name=element-web \
+                                  --pull=always \
+                                  --pod=matrix \
+                                  --rm \
+                                  --volume /var/srv/element-web:/etc/nginx:ro,z \
+                                  --volume /var/srv/element-web/config.json:/app/config.json:ro,z \
+                                  docker.io/vectorim/element-web:latest
+        ExecStop=/bin/podman rm -f nginx
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   directories:
