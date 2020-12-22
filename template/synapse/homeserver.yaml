@@ -40,7 +40,7 @@ pid_file: /data/homeserver.pid
 # under the 'listeners' configuration, however this is a security risk:
 # https://github.com/matrix-org/synapse#security-note
 #
-web_client_location: https://client.%%DOMAIN_NAME%%/
+web_client_location: https://chat.%%DOMAIN_NAME%%/
 
 # The public-facing base URL that clients use to access this HS
 # (not including _matrix/...). This is the same URL a user would
