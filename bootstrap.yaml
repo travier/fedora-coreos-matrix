@@ -1,0 +1,81 @@
+variant: fcos
+version: 1.3.0
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - %%SSH_PUBKEY%%
+
+systemd:
+  units:
+    - name: cgroups-v2-karg.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Switch To cgroups v2
+        # We run after `systemd-machine-id-commit.service` to ensure that
+        # `ConditionFirstBoot=true` services won't rerun on the next boot.
+        After=systemd-machine-id-commit.service
+        ConditionKernelCommandLine=systemd.unified_cgroup_hierarchy
+        ConditionPathExists=!/var/lib/cgroups-v2-karg.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/bin/rpm-ostree kargs --delete=systemd.unified_cgroup_hierarchy
+        ExecStart=/bin/touch /var/lib/cgroups-v2-karg.stamp
+        ExecStart=/bin/systemctl --no-block reboot
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: nginx-http.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the nginx HTTP server for Let's Encrypt bootstrap
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        ExecStart=/bin/podman run --name=nginx-http \
+                                  --pull=always \
+                                  --rm \
+                                  --publish 80:80 \
+                                  --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
+                                  --volume /var/srv/nginx-http:/etc/nginx:ro,z \
+                                  docker.io/nginx:stable
+        ExecStop=/bin/podman rm -f nginx-http
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: certbot.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run certbot to get certificats from Let's Encrypt
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/podman run --name=certbot \
+                                  --pull=always  \
+                                  --rm \
+                                  --cap-drop all \
+                                  --volume /var/srv/letsencrypt-webroot:/var/lib/letsencrypt:rw,z \
+                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:rw,z \
+                                  docker.io/certbot/certbot:latest \
+                                  --agree-tos --webroot certonly
+        ExecStop=/bin/podman rm -f certbot
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    - path: /var/srv/nginx-http/nginx.conf
+      contents:
+        local: nginx.conf
+    - path: /var/srv/letsencrypt-certs/cli.ini
+      contents:
+        local: cli.ini
