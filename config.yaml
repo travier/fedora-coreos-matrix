@@ -134,7 +134,6 @@ systemd:
                                   --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:rw,z \
                                   docker.io/certbot/certbot:latest \
                                   --agree-tos --webroot certonly
-        ExecStop=/bin/podman rm -f certbot
 
         [Install]
         WantedBy=multi-user.target
@@ -180,6 +179,39 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: certbot.timer
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Weekly check for Let's Encrypt's certificates renewal
+
+        [Timer]
+        OnCalendar=Sun *-*-* 02:00:00
+        Persistent=true
+
+        [Install]
+        WantedBy=timers.target
+    - name: certbot.service
+      enabled: false
+      contents: |
+        [Unit]
+        Description=Let's Encrypt certificate renewal
+        ConditionPathExists=/var/srv/letsencrypt-certs/archive
+        After=network-online.target nginx-http.service
+        Wants=network-online.target
+        Requires=nginx-http.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/podman run --name=certbot \
+                                  --pod=matrix \
+                                  --rm \
+                                  --cap-drop all \
+                                  --volume /var/srv/letsencrypt-webroot:/var/lib/letsencrypt:rw,z \
+                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:rw,z \
+                                  docker.io/certbot/certbot:latest \
+                                  renew
+        ExecStartPost=/bin/systemctl restart --no-block nginx.service
 
 storage:
   directories:
