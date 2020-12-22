@@ -88,21 +88,45 @@ systemd:
         ExecStop=/bin/podman rm -f synapse
         [Install]
         WantedBy=multi-user.target
+    - name: nginx.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the nginx server
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        ExecStartPre=/bin/podman pull docker.io/nginx:stable
+        ExecStart=/bin/podman run --name=nginx \
+                                  --pod=matrix \
+                                  --rm \
+                                  --volume /var/srv/nginx:/etc/nginx:ro,z \
+                                  --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
+                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:ro,z \
+                                  --volume /var/srv/well-known:/var/well-known:ro,z \
+                                  docker.io/nginx:stable
+        ExecStop=/bin/podman rm -f nginx
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
+  directories:
+    - path: /var/srv
+      mode: 0700
+      user:
+        name: root
+      group:
+        name: root
   trees:
     - local: synapse
       path: /var/srv/synapse
-  directories:
-    - path: /var/srv/postgres
-      mode: 0700
-      user:
-        name: root
-      group:
-        name: root
-    - path: /var/srv/synapse/media_store
-      mode: 0700
-      user:
-        name: root
-      group:
-        name: root
+    - local: postgres
+      path: /var/srv/postgres
+    - local: nginx
+      path: /var/srv/nginx
+    - local: well-known
+      path: /var/srv/well-known
+    - local: letsencrypt-webroot
+      path: /var/srv/letsencrypt-webroot
