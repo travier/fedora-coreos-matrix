@@ -104,7 +104,8 @@ systemd:
                                   --pull=always \
                                   --pod=matrix \
                                   --rm \
-                                  --volume /var/srv/nginx:/etc/nginx:ro,z \
+                                  --volume /var/srv/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z \
+                                  --volume /var/srv/nginx/dhparam:/etc/nginx/dhparam:ro,z \
                                   --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
                                   --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:ro,z \
                                   --volume /var/srv/well-known:/var/well-known:ro,z \
@@ -153,7 +154,7 @@ systemd:
                                   --rm \
                                   --publish 80:80 \
                                   --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
-                                  --volume /var/srv/nginx-http:/etc/nginx:ro,z \
+                                  --volume /var/srv/nginx-http/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   docker.io/nginx:stable
         ExecStop=/bin/podman rm -f nginx-http
 
@@ -172,7 +173,7 @@ systemd:
                                   --pull=always \
                                   --pod=matrix \
                                   --rm \
-                                  --volume /var/srv/element-web:/etc/nginx:ro,z \
+                                  --volume /var/srv/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   --volume /var/srv/element-web/config.json:/app/config.json:ro,z \
                                   docker.io/vectorim/element-web:latest
         ExecStop=/bin/podman rm -f nginx
