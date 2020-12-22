@@ -77,6 +77,7 @@ systemd:
         Description=Run the synapse service.
         After=podmanpod.service network-online.target
         Wants=network-online.target
+
         [Service]
         ExecStart=/bin/podman run --name=synapse \
                                   --pull=always  \
