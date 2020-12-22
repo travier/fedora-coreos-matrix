@@ -35,7 +35,7 @@ systemd:
         [Unit]
         Description=Creates a podman pod to run the matrix services.
         After=cgroups-v2-karg.service network-online.target
-        Wants=network-online.target
+        Wants=After=cgroups-v2-karg.service network-online.target
 
         [Service]
         Type=oneshot
@@ -52,6 +52,7 @@ systemd:
         Description=Run the database service for matrix
         After=podmanpod.service network-online.target
         Wants=network-online.target
+        Requires=podmanpod.service
 
         [Service]
         ExecStart=/bin/podman run --name=postgres \
@@ -77,6 +78,7 @@ systemd:
         Description=Run the synapse service.
         After=podmanpod.service network-online.target
         Wants=network-online.target
+        Requires=podmanpod.service
 
         [Service]
         ExecStart=/bin/podman run --name=synapse \
@@ -94,9 +96,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the nginx server
-        After=network-online.target certbot-firstboot.service
+        After=podmanpod.service network-online.target certbot-firstboot.service
         Wants=network-online.target
-        Requires=certbot-firstboot.service
+        Requires=podmanpod.service certbot-firstboot.service
 
         [Service]
         ExecStartPre=/bin/podman pull docker.io/nginx:stable
@@ -120,9 +122,9 @@ systemd:
         [Unit]
         Description=Extract certificates from Let's Encrypt
         ConditionPathExists=!/var/srv/letsencrypt-certs/archive
-        After=network-online.target nginx-http.service
+        After=podmanpod.service network-online.target nginx-http.service
         Wants=network-online.target
-        Requires=nginx-http.service
+        Requires=podmanpod.service nginx-http.service
 
         [Service]
         Type=oneshot
@@ -136,8 +138,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the nginx HTTP server for Let's Encrypt bootstrap
-        After=network-online.target
+        After=podmanpod.service network-online.target
         Wants=network-online.target
+        Requires=podmanpod.service
 
         [Service]
         # Pull the image in ExecStartPre for more accurate startup dependency tracking
@@ -145,7 +148,6 @@ systemd:
         ExecStart=/bin/podman run --name=nginx-http \
                                   --pod=matrix \
                                   --rm \
-                                  --publish 80:80 \
                                   --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
                                   --volume /var/srv/nginx-http/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   docker.io/nginx:stable
@@ -158,8 +160,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the element-web container
-        After=network-online.target
+        After=podmanpod.service network-online.target
         Wants=network-online.target
+        Requires=podmanpod.service
 
         [Service]
         ExecStart=/bin/podman run --name=element-web \
@@ -191,9 +194,9 @@ systemd:
         [Unit]
         Description=Let's Encrypt certificate renewal
         ConditionPathExists=/var/srv/letsencrypt-certs/archive
-        After=network-online.target nginx-http.service
+        After=podmanpod.service network-online.target nginx-http.service
         Wants=network-online.target
-        Requires=nginx-http.service
+        Requires=podmanpod.service nginx-http.service
 
         [Service]
         Type=oneshot
