@@ -94,12 +94,14 @@ systemd:
       contents: |
         [Unit]
         Description=Run the nginx server
-        After=network-online.target
+        After=network-online.target certbot-firstboot.service
         Wants=network-online.target
+        Requires=certbot-firstboot.service
 
         [Service]
         ExecStartPre=/bin/podman pull docker.io/nginx:stable
         ExecStart=/bin/podman run --name=nginx \
+                                  --pull=always \
                                   --pod=matrix \
                                   --rm \
                                   --volume /var/srv/nginx:/etc/nginx:ro,z \
@@ -108,6 +110,52 @@ systemd:
                                   --volume /var/srv/well-known:/var/well-known:ro,z \
                                   docker.io/nginx:stable
         ExecStop=/bin/podman rm -f nginx
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: certbot-firstboot.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run certbot to get certificates from Let's Encrypt
+        ConditionPathExists=!/var/srv/letsencrypt-certs/archive
+        After=network-online.target nginx-http.service
+        Wants=network-online.target
+        Requires=nginx-http.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/podman run --name=certbot \
+                                  --pod=matrix \
+                                  --rm \
+                                  --cap-drop all \
+                                  --volume /var/srv/letsencrypt-webroot:/var/lib/letsencrypt:rw,z \
+                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:rw,z \
+                                  docker.io/certbot/certbot:latest \
+                                  --agree-tos --webroot certonly
+        ExecStop=/bin/podman rm -f certbot
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: nginx-http.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the nginx HTTP server for Let's Encrypt bootstrap
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        # Pull the image in ExecStartPre for more accurate startup dependency tracking
+        ExecStartPre=/bin/podman pull docker.io/nginx:stable
+        ExecStart=/bin/podman run --name=nginx-http \
+                                  --pod=matrix \
+                                  --rm \
+                                  --publish 80:80 \
+                                  --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
+                                  --volume /var/srv/nginx-http:/etc/nginx:ro,z \
+                                  docker.io/nginx:stable
+        ExecStop=/bin/podman rm -f nginx-http
 
         [Install]
         WantedBy=multi-user.target
@@ -127,7 +175,11 @@ storage:
       path: /var/srv/postgres
     - local: nginx
       path: /var/srv/nginx
-    - local: well-known
-      path: /var/srv/well-known
+    - local: nginx-http
+      path: /var/srv/nginx-http
+    - local: letsencrypt-certs
+      path: /var/srv/letsencrypt-certs
     - local: letsencrypt-webroot
       path: /var/srv/letsencrypt-webroot
+    - local: well-known
+      path: /var/srv/well-known

@@ -9,6 +9,12 @@ For this setup, you need a domain name and two sub-domains:
   * matrix.example.tld
   * chat.example.tld
 
+For Let's Encrypt support, those domains must be configured beforehand to
+resolve to the IP address that will be assigned to your server. If you do not
+know what IP address will be assigned to you server in advance (common case in
+some cloud providers), you might want to use another ACME challenge method to
+get Let's Encrypt certificates (see [DNS Plugins][plugins]).
+
 ## How to use
 
 To generate the Ignition configs, you need `make` and `fcct`.
@@ -21,28 +27,7 @@ $ ${EDITOR} secrets
 # Fill in all values
 ```
 
-Then, you can generate the bootstrap Ignition config to create an instance that
-will use Let's Encrypt to get certificates for your domain. You can skip this
-step if yoiu already have certificates or prefer to get them differently. You
-might also need to adapt this step to use another challenge method if you are
-running in a cloud provider (see [DNS Plugins][plugins]).
-
-```
-$ make bootstrap
-```
-
-See the [Deploying](#Deploying) section for starting an instance with this
-configuration.
-
-Once this instance is successfully launched, you can retreive the certificates
-using:
-
-```
-TODO
-```
-
-
-### Configure Synapse
+### Configuring Synapse
 
 The synapse configuration requires to setup a few secrets, you can generate these secret using
 the following command :
@@ -92,7 +77,9 @@ Move `my.matrix.host.signing.key` under `template/synapse/synapse.signing.key`
 ```
 $ mv my.matrix.host.signing.key template/synapse/synapse.signing.key
 ```
+
 #### Logging
+
 If you want to change the logging configuration, you can edit directly `template/synapse/synapse.log.config`
 
 ## Generate the ignition configuration
@@ -103,11 +90,12 @@ Finally, you can generate the final Ignition config with:
 $ make
 ```
 
-And start your Fedora CoreOS Matrix home server.
+You are now ready to deploy your Fedora CoreOS Matrix home server.
 
 ## Deploying
 
-See the [Fedora CoreOS docs][deploy] for your platform.
+See the [Fedora CoreOS docs][deploy] for instructions on how to use this
+Ignition config to deploy a Fedora CoreOS instance on your prefered platform.
 
 [deploy]: https://docs.fedoraproject.org/en-US/fedora-coreos/getting-started/
 [plugins]: https://certbot.eff.org/docs/using.html#dns-plugins
