@@ -224,18 +224,17 @@ storage:
         name: root
       group:
         name: root
+    - path: /var/srv/synapse/media_store
+    - path: /var/srv/postgres
+    - path: /var/srv/letsencrypt-webroot
   trees:
     - local: synapse
       path: /var/srv/synapse
-    - local: postgres
-      path: /var/srv/postgres
     - local: nginx
       path: /var/srv/nginx
     - local: nginx-http
       path: /var/srv/nginx-http
     - local: letsencrypt-certs
       path: /var/srv/letsencrypt-certs
-    - local: letsencrypt-webroot
-      path: /var/srv/letsencrypt-webroot
     - local: well-known
       path: /var/srv/well-known
