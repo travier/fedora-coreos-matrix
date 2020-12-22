@@ -40,7 +40,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=sh -c 'podman pod exists matrix || podman pod create -n matrix -p 8008:8008 -p 5432:5432'
+        ExecStart=sh -c 'podman pod exists matrix || podman pod create -n matrix -p 80:80 -p 443:443 -p 8448:8448'
 
         [Install]
         WantedBy=multi-user.target
