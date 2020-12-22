@@ -15,6 +15,10 @@ know what IP address will be assigned to you server in advance (common case in
 some cloud providers), you might want to use another ACME challenge method to
 get Let's Encrypt certificates (see [DNS Plugins][plugins]).
 
+If you already have certificates from Let's Encrypt or another provider, see
+the [Alternative with certificates](#alternative-with-certificates) section.
+
+
 ## How to use
 
 To generate the Ignition configs, you need `make` and `fcct`.
@@ -96,6 +100,46 @@ You are now ready to deploy your Fedora CoreOS Matrix home server.
 
 See the [Fedora CoreOS docs][deploy] for instructions on how to use this
 Ignition config to deploy a Fedora CoreOS instance on your prefered platform.
+
+## Alternative with certificates
+
+If you already have certificates from Let's Encrypt, you can create an archive
+named `certs.tar.gz` including your certificates and certbot config with the
+following format:
+
+```
+letsencrypt-certs/
+letsencrypt-certs/cli.ini
+letsencrypt-certs/accounts/
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/directory/
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/directory/<changeme>/
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/directory/<changeme>/private_key.json
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/directory/<changeme>/meta.json
+letsencrypt-certs/accounts/acme-v02.api.letsencrypt.org/directory/<changeme>/regr.json
+letsencrypt-certs/renewal/
+letsencrypt-certs/renewal/<DOMAIN_NAME>.conf
+letsencrypt-certs/keys/
+letsencrypt-certs/keys/0000_key-certbot.pem
+letsencrypt-certs/csr/
+letsencrypt-certs/csr/0000_csr-certbot.pem
+letsencrypt-certs/archive/
+letsencrypt-certs/archive/<DOMAIN_NAME>/
+letsencrypt-certs/archive/<DOMAIN_NAME>/cert1.pem
+letsencrypt-certs/archive/<DOMAIN_NAME>/privkey1.pem
+letsencrypt-certs/archive/<DOMAIN_NAME>/chain1.pem
+letsencrypt-certs/archive/<DOMAIN_NAME>/fullchain1.pem
+letsencrypt-certs/live/
+letsencrypt-certs/live/<DOMAIN_NAME>/
+letsencrypt-certs/live/<DOMAIN_NAME>/cert.pem
+letsencrypt-certs/live/<DOMAIN_NAME>/privkey.pem
+letsencrypt-certs/live/<DOMAIN_NAME>/chain.pem
+letsencrypt-certs/live/<DOMAIN_NAME>/fullchain.pem
+letsencrypt-certs/live/<DOMAIN_NAME>/README
+```
+
+Then fill your other secrets and build the Ignition config with `make certs`
+and proceed to deployment.
 
 [deploy]: https://docs.fedoraproject.org/en-US/fedora-coreos/getting-started/
 [plugins]: https://certbot.eff.org/docs/using.html#dns-plugins
