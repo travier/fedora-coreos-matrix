@@ -28,26 +28,81 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: podmanpod.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Creates a podman pod to run the matrix services.
+        After=cgroups-v2-karg.service network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=sh -c 'podman pod exists matrix || podman pod create -n matrix -p 8008:8008 -p 5432:5432'
+
+        [Install]
+        WantedBy=multi-user.target
+
     - name: postgres.service
       enabled: true
       contents: |
         [Unit]
         Description=Run the database service for matrix
-        After=network-online.target
+        After=podmanpod.service network-online.target
         Wants=network-online.target
 
         [Service]
         ExecStart=/bin/podman run --name=postgres \
                                   --pull=always  \
                                   --read-only \
-                                  --net=host \
+                                  --pod=matrix \
+                                  --rm \
                                   -e POSTGRES_USER=synapse \
                                   -e POSTGRES_DB=synapse \
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
                                   -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
-                                  -v /var/srv:/var/lib/postgresql/data:z \
+                                  -v /var/srv/postgres:/var/lib/postgresql/data:z \
                                   docker.io/library/postgres:13
         ExecStop=/bin/podman rm -f postgres
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: synapse.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run the synapse service.
+        After=podmanpod.service network-online.target
+        Wants=network-online.target
+        [Service]
+        ExecStart=/bin/podman run --name=synapse \
+                                  --pull=always  \
+                                  --read-only \
+                                  --pod=matrix \
+                                  --rm \
+                                  -v /var/srv/synapse:/data:z \
+                                  docker.io/matrixdotorg/synapse:v1.24.0
+        ExecStop=/bin/podman rm -f synapse
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  trees:
+    - local: synapse
+      path: /var/srv/synapse
+  directories:
+    - path: /var/srv/postgres
+      mode: 0700
+      user:
+        name: root
+      group:
+        name: root
+    - path: /var/srv/synapse/media_store
+      mode: 0700
+      user:
+        name: root
+      group:
+        name: root
