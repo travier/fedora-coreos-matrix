@@ -238,3 +238,5 @@ storage:
       path: /var/srv/letsencrypt-certs
     - local: well-known
       path: /var/srv/well-known
+    - local: element-web
+      path: /var/srv/element-web
