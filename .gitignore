@@ -2,9 +2,6 @@
 /certs.tar.gz
 
 /config
-/config.ign
-
-/config-bootstrap
-/bootstrap.ign
+/config*.ign
 
 /generated
