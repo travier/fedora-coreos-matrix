@@ -104,7 +104,7 @@ Registration is disabled by default to avoid issues. You can login to the
 server and add accounts with:
 
 ```
-$ sudo podman run --rm -tty ---interactive \
+$ sudo podman run --rm --tty ---interactive \
       --pod=matrix \
       -v /var/srv/synapse:/data:z \
       --entrypoint register_new_matrix_user \
