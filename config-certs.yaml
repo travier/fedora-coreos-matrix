@@ -66,7 +66,8 @@ systemd:
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
                                   -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
                                   -v /var/srv/postgres:/var/lib/postgresql/data:z \
-                                  docker.io/library/postgres:13
+                                  docker.io/library/postgres:13 \
+                                  -c listen_addresses='*'
         ExecStop=/bin/podman rm -f postgres
 
         [Install]
@@ -90,6 +91,7 @@ systemd:
                                   -v /var/srv/synapse:/data:z \
                                   docker.io/matrixdotorg/synapse:v1.24.0
         ExecStop=/bin/podman rm -f synapse
+
         [Install]
         WantedBy=multi-user.target
     - name: nginx.service
@@ -173,7 +175,7 @@ systemd:
                                   --volume /var/srv/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   --volume /var/srv/element-web/config.json:/app/config.json:ro,z \
                                   docker.io/vectorim/element-web:latest
-        ExecStop=/bin/podman rm -f nginx
+        ExecStop=/bin/podman rm -f element-web
 
         [Install]
         WantedBy=multi-user.target
@@ -220,6 +222,7 @@ storage:
       group:
         name: root
     - path: /var/srv/synapse/media_store
+      mode: 0777
     - path: /var/srv/postgres
     - path: /var/srv/letsencrypt-webroot
   trees:
