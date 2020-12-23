@@ -228,6 +228,7 @@ storage:
       group:
         name: root
     - path: /var/srv/synapse/media_store
+      mode: 0777
     - path: /var/srv/postgres
     - path: /var/srv/letsencrypt-webroot
   trees:
