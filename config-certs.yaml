@@ -12,7 +12,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Switch To cgroups v2
+        Description=Switch To cgroups v2 and disable Docker
         # We run after `systemd-machine-id-commit.service` to ensure that
         # `ConditionFirstBoot=true` services won't rerun on the next boot.
         After=systemd-machine-id-commit.service
@@ -22,6 +22,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
+        ExecStart=/bin/systemctl disable --now docker.socket
         ExecStart=/bin/rpm-ostree kargs --delete=systemd.unified_cgroup_hierarchy
         ExecStart=/bin/touch /var/lib/cgroups-v2-karg.stamp
         ExecStart=/bin/systemctl --no-block reboot
