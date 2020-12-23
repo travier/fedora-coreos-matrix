@@ -66,7 +66,8 @@ systemd:
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
                                   -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
                                   -v /var/srv/postgres:/var/lib/postgresql/data:z \
-                                  docker.io/library/postgres:13
+                                  docker.io/library/postgres:13 \
+                                  -c listen_addresses='*'
         ExecStop=/bin/podman rm -f postgres
 
         [Install]
