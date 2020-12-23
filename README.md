@@ -98,6 +98,20 @@ You are now ready to deploy your Fedora CoreOS Matrix home server.
 See the [Fedora CoreOS docs][deploy] for instructions on how to use this
 Ignition config to deploy a Fedora CoreOS instance on your prefered platform.
 
+## Registering new users
+
+Registration is disabled by default to avoid issues. You can login to the
+server and add accounts with:
+
+```
+$ sudo podman run --rm -tty ---interactive \
+      --pod=matrix \
+      -v /var/srv/synapse:/data:z \
+      --entrypoint register_new_matrix_user \
+      docker.io/matrixdotorg/synapse:v1.24.0 \
+      -c /data/homeserver.yaml http://127.0.0.1:8008
+```
+
 ## Alternative with certificates
 
 If you already have certificates from Let's Encrypt, you can create an archive
