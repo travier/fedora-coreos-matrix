@@ -90,7 +90,7 @@ systemd:
                                   --pod=matrix \
                                   --rm \
                                   -v /var/srv/synapse:/data:z \
-                                  docker.io/matrixdotorg/synapse:v1.24.0
+                                  docker.io/matrixdotorg/synapse:latest
         ExecStop=/bin/podman rm -f synapse
 
         [Install]
