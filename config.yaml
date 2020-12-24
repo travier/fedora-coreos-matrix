@@ -56,6 +56,7 @@ systemd:
         Requires=podmanpod.service
 
         [Service]
+        EnvironmentFile=/etc/postgresql_synapse
         ExecStart=/bin/podman run --name=postgres \
                                   --pull=always  \
                                   --read-only \
@@ -64,7 +65,7 @@ systemd:
                                   -e POSTGRES_USER=synapse \
                                   -e POSTGRES_DB=synapse \
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
-                                  -e POSTGRES_PASSWORD=%%POSTGRES_PASSWORD%% \
+                                  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
                                   -v /var/srv/postgres:/var/lib/postgresql/data:z \
                                   docker.io/library/postgres:13 \
                                   -c listen_addresses='*'
@@ -223,10 +224,6 @@ storage:
   directories:
     - path: /var/srv
       mode: 0700
-      user:
-        name: root
-      group:
-        name: root
     - path: /var/srv/synapse/media_store
       mode: 0777
     - path: /var/srv/postgres
@@ -244,3 +241,8 @@ storage:
       path: /var/srv/well-known
     - local: element-web
       path: /var/srv/element-web
+  files:
+    - path: /etc/postgresql_synapse
+      contents:
+        local: postgresql_synapse
+      mode: 0700
