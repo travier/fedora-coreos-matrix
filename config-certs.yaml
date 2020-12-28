@@ -66,7 +66,7 @@ systemd:
                                   -e POSTGRES_DB=synapse \
                                   -e POSTGRES_INITDB_ARGS="--encoding='UTF8' --lc-collate='C' --lc-ctype='C'" \
                                   -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-                                  -v /var/srv/postgres:/var/lib/postgresql/data:z \
+                                  -v /var/srv/matrix/postgres:/var/lib/postgresql/data:z \
                                   docker.io/library/postgres:13 \
                                   -c listen_addresses='*'
         ExecStop=/bin/podman rm -f postgres
@@ -89,7 +89,7 @@ systemd:
                                   --read-only \
                                   --pod=matrix \
                                   --rm \
-                                  -v /var/srv/synapse:/data:z \
+                                  -v /var/srv/matrix/synapse:/data:z \
                                   docker.io/matrixdotorg/synapse:latest
         ExecStop=/bin/podman rm -f synapse
 
@@ -110,11 +110,11 @@ systemd:
                                   --pull=always \
                                   --pod=matrix \
                                   --rm \
-                                  --volume /var/srv/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z \
-                                  --volume /var/srv/nginx/dhparam:/etc/nginx/dhparam:ro,z \
-                                  --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
-                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:ro,z \
-                                  --volume /var/srv/well-known:/var/well-known:ro,z \
+                                  --volume /var/srv/matrix/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,z \
+                                  --volume /var/srv/matrix/nginx/dhparam:/etc/nginx/dhparam:ro,z \
+                                  --volume /var/srv/matrix/letsencrypt-webroot:/var/www:ro,z \
+                                  --volume /var/srv/matrix/letsencrypt-certs:/etc/letsencrypt:ro,z \
+                                  --volume /var/srv/matrix/well-known:/var/well-known:ro,z \
                                   docker.io/nginx:stable
         ExecStop=/bin/podman rm -f nginx
 
@@ -132,8 +132,8 @@ systemd:
 
         [Service]
         Type=oneshot
-        ExecStart=/bin/tar --extract --file /var/srv/certs.tar.gz --directory /var/srv
-        ExecStart=/bin/rm /var/srv/certs.tar.gz
+        ExecStart=/bin/tar --extract --file /var/srv/matrix/certs.tar.gz --directory /var/srv/matrix
+        ExecStart=/bin/rm /var/srv/matrix/certs.tar.gz
 
         [Install]
         WantedBy=multi-user.target
@@ -152,8 +152,8 @@ systemd:
         ExecStart=/bin/podman run --name=nginx-http \
                                   --pod=matrix \
                                   --rm \
-                                  --volume /var/srv/letsencrypt-webroot:/var/www:ro,z \
-                                  --volume /var/srv/nginx-http/nginx.conf:/etc/nginx/nginx.conf:ro,z \
+                                  --volume /var/srv/matrix/letsencrypt-webroot:/var/www:ro,z \
+                                  --volume /var/srv/matrix/nginx-http/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   docker.io/nginx:stable
         ExecStop=/bin/podman rm -f nginx-http
 
@@ -173,8 +173,8 @@ systemd:
                                   --pull=always \
                                   --pod=matrix \
                                   --rm \
-                                  --volume /var/srv/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z \
-                                  --volume /var/srv/element-web/config.json:/app/config.json:ro,z \
+                                  --volume /var/srv/matrix/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z \
+                                  --volume /var/srv/matrix/element-web/config.json:/app/config.json:ro,z \
                                   docker.io/vectorim/element-web:latest
         ExecStop=/bin/podman rm -f element-web
 
@@ -208,43 +208,39 @@ systemd:
                                   --pod=matrix \
                                   --rm \
                                   --cap-drop all \
-                                  --volume /var/srv/letsencrypt-webroot:/var/lib/letsencrypt:rw,z \
-                                  --volume /var/srv/letsencrypt-certs:/etc/letsencrypt:rw,z \
+                                  --volume /var/srv/matrix/letsencrypt-webroot:/var/lib/letsencrypt:rw,z \
+                                  --volume /var/srv/matrix/letsencrypt-certs:/etc/letsencrypt:rw,z \
                                   docker.io/certbot/certbot:latest \
                                   renew
         ExecStartPost=/bin/systemctl restart --no-block nginx.service
 
 storage:
   directories:
-    - path: /var/srv
+    - path: /var/srv/matrix
       mode: 0700
-    - path: /var/srv/synapse/media_store
+    - path: /var/srv/matrix/synapse/media_store
       mode: 0777
-    - path: /var/srv/postgres
-    - path: /var/srv/letsencrypt-webroot
+    - path: /var/srv/matrix/postgres
+    - path: /var/srv/matrix/letsencrypt-webroot
   trees:
     - local: synapse
-      path: /var/srv/synapse
+      path: /var/srv/matrix/synapse
     - local: nginx
-      path: /var/srv/nginx
+      path: /var/srv/matrix/nginx
     - local: nginx-http
-      path: /var/srv/nginx-http
+      path: /var/srv/matrix/nginx-http
     - local: letsencrypt-certs
-      path: /var/srv/letsencrypt-certs
+      path: /var/srv/matrix/letsencrypt-certs
     - local: well-known
-      path: /var/srv/well-known
+      path: /var/srv/matrix/well-known
     - local: element-web
-      path: /var/srv/element-web
+      path: /var/srv/matrix/element-web
   files:
     - path: /etc/postgresql_synapse
       contents:
         local: postgresql_synapse
       mode: 0700
-    - path: /var/srv/certs.tar.gz
+    - path: /var/srv/matrix/certs.tar.gz
       mode: 0700
       contents:
         local: certs.tar.gz
-      user:
-        name: root
-      group:
-        name: root
