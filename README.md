@@ -140,6 +140,54 @@ start_time = "02:00"
 length_minutes = 120
 ```
 
+### PostgreSQL major version updates
+
+Major PostgreSQL version updates require manual intervention to dump the
+database with the current version and then import it in the new version. We
+thus can not use the `latest` tag for this container image and manual
+intervention will be required approximately once a year to update the PostreSQL
+container version.
+
+See this example to dump the current database and import it in the new version:
+
+```
+# Stop Synapse server to ensure no-one is writing to the database
+$ systemctl stop synapse
+
+# Dump the database
+$ mkdir /var/srv/postgres.dump
+$ cat /etc/postgresql_synapse
+$ podman run --read-only --pod=matrix --rm \
+      --tty --interactive \
+      -v /var/srv/matrix/postgres.dump:/var/data:z \
+      docker.io/library/postgres:13 \
+      pg_dump --file=/var/data/dump.sql --format=c --username=synapse \
+      --password --host=localhost synapse
+
+# Stop the PostgreSQL container
+$ systemctl stop postgres
+
+# Edit the PostgreSQL unit to update the container version
+$ vi /etc/systemd/system/postgres.service
+
+# Start the new PostgreSQL container
+$ systemctl start postgres
+
+# Import the existing database
+$ podman run --read-only --pod=matrix --rm \
+      --tty --interactive \
+      -v /var/srv/matrix/postgres.dump:/var/data:ro,z \
+      docker.io/library/postgres:13 \
+      pg_restore --username=synapse --password --host=localhost \
+      --dbname=synapse /var/data/dump.sql
+
+# Start Synapse again
+$ systemctl start synapse
+
+# Cleanup once everything is confirmed working
+$ rm -rf /var/srv/matrix/postgres.dump
+```
+
 ## Alternative with certificates
 
 If you already have certificates from Let's Encrypt, you can create an archive
