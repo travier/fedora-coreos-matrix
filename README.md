@@ -106,9 +106,9 @@ server and add accounts with:
 ```
 $ sudo podman run --rm --tty --interactive \
       --pod=matrix \
-      -v /var/srv/synapse:/data:z \
+      -v /var/srv/matrix/synapse:/data:z,ro \
       --entrypoint register_new_matrix_user \
-      docker.io/matrixdotorg/synapse:v1.24.0 \
+      docker.io/matrixdotorg/synapse:latest \
       -c /data/homeserver.yaml http://127.0.0.1:8008
 ```
 
