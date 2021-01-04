@@ -148,7 +148,8 @@ thus can not use the `latest` tag for this container image and manual
 intervention will be required approximately once a year to update the PostreSQL
 container version.
 
-See this example to dump the current database and import it in the new version:
+See this example to dump the current database and import it when moving from
+version 13 to 14:
 
 ```
 # Stop Synapse server to ensure no-one is writing to the database
@@ -157,8 +158,7 @@ $ systemctl stop synapse
 # Dump the database
 $ mkdir /var/srv/matrix/postgres.dump
 $ cat /etc/postgresql_synapse
-$ podman run --read-only --pod=matrix --rm \
-      --tty --interactive \
+$ podman run --read-only --pod=matrix --rm --tty --interactive \
       -v /var/srv/matrix/postgres.dump:/var/data:z \
       docker.io/library/postgres:13 \
       pg_dump --file=/var/data/dump.sql --format=c --username=synapse \
@@ -167,17 +167,20 @@ $ podman run --read-only --pod=matrix --rm \
 # Stop the PostgreSQL container
 $ systemctl stop postgres
 
+# Keep existing database as backup
+$ mv /var/srv/matrix/postgres /var/srv/matrix/postgres.bak
+$ mkdir /var/srv/matrix/postgres
+
 # Edit the PostgreSQL unit to update the container version
 $ vi /etc/systemd/system/postgres.service
 
 # Start the new PostgreSQL container
 $ systemctl start postgres
 
-# Import the existing database
-$ podman run --read-only --pod=matrix --rm \
-      --tty --interactive \
+# Import the database. Make sure to use the new PostgreSQL container image
+$ podman run --read-only --pod=matrix --rm --tty --interactive \
       -v /var/srv/matrix/postgres.dump:/var/data:ro,z \
-      docker.io/library/postgres:13 \
+      docker.io/library/postgres:14 \
       pg_restore --username=synapse --password --host=localhost \
       --dbname=synapse /var/data/dump.sql
 
@@ -185,7 +188,7 @@ $ podman run --read-only --pod=matrix --rm \
 $ systemctl start synapse
 
 # Cleanup once everything is confirmed working
-$ rm -rf /var/srv/matrix/postgres.dump
+$ rm -rf /var/srv/matrix/postgres.dump /var/srv/matrix/postgres.bak
 ```
 
 [deploy]: https://docs.fedoraproject.org/en-US/fedora-coreos/getting-started/
