@@ -83,6 +83,34 @@ If you wish to change other synapse settings you can edit directly
 `template/synapse/homeserver.yaml` and `template/synapse/synapse.log.config` to
 change the logging configuration.
 
+### System and container updates
+
+By default, Fedora CoreOS systems are updated automatically to the latest
+released update. This makes sure that the system is always on top of security
+issues (and updated with the latest features) wthout any user interaction
+needed. The containers, as defined in the systemd units in the config, are
+updated on each service startup. They will thus be updated at least once after
+each system update as this will trigger a reboot approximately every two week.
+
+To maximise availability, you can set an [update strategy][updates] in
+Zincati's configuration to only allow reboots for updates during certain
+periods of time.  For example, one might want to only allow reboots on week
+days, between 2 AM and 4 AM UTC, which is a timeframe where reboots should have
+the least user impact on the service. Make sure to pick the correct time for
+your timezone as Fedora CoreOS uses the UTC timezone by default.
+
+See this example config that you can append to `config.yaml`:
+
+```
+[updates]
+strategy = "periodic"
+
+[[updates.periodic.window]]
+days = [ "Mon", "Tue", "Wed", "Thu", "Fri" ]
+start_time = "02:00"
+length_minutes = 120
+```
+
 ## Generate the ignition configuration
 
 Finally, you can generate the final Ignition config with:
@@ -112,35 +140,7 @@ $ sudo podman run --rm --tty --interactive \
       -c /data/homeserver.yaml http://127.0.0.1:8008
 ```
 
-## System and container updates
-
-By default, Fedora CoreOS systems are updated automatically to the latest
-released update. This makes sure that the system is always on top of security
-issues (and updated with the latest features) wthout any user interaction
-needed. The containers, as defined in the systemd units in the config, are
-updated on each service startup. They will thus be updated at least once after
-each system update as this will trigger a reboot approximately every two week.
-
-To maximise availability, you can set an [update strategy][updates] in
-Zincati's configuration to only allow reboots for updates during certain
-periods of time.  For example, one might want to only allow reboots on week
-days, between 2 AM and 4 AM UTC, which is a timeframe where reboots should have
-the least user impact on the service. Make sure to pick the correct time for
-your timezone as Fedora CoreOS uses the UTC timezone by default.
-
-See this example config that you can append to `config.yaml`:
-
-```
-[updates]
-strategy = "periodic"
-
-[[updates.periodic.window]]
-days = [ "Mon", "Tue", "Wed", "Thu", "Fri" ]
-start_time = "02:00"
-length_minutes = 120
-```
-
-### PostgreSQL major version updates
+## PostgreSQL major version updates
 
 Major PostgreSQL version updates require manual intervention to dump the
 database with the current version and then import it in the new version. We
