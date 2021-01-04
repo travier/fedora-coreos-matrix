@@ -11,9 +11,9 @@ For this setup, you need a domain name and two sub-domains:
 
 For Let's Encrypt support, those domains must be configured beforehand to
 resolve to the IP address that will be assigned to your server. If you do not
-know what IP address will be assigned to you server in advance (common case in
-some cloud providers), you might want to use another ACME challenge method to
-get Let's Encrypt certificates (see [DNS Plugins][plugins]).
+know what IP address will be assigned to your server in advance, you might want
+to use another ACME challenge method to get Let's Encrypt certificates (see
+[DNS Plugins][plugins]).
 
 If you already have certificates from Let's Encrypt or another provider, see
 the [Alternative with certificates](#alternative-with-certificates) section.
