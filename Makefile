@@ -12,5 +12,4 @@ all:
 	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_MACAROON_SECRET_KEY%%/${SYNAPSE_MACAROON_SECRET_KEY}/'
 	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_FORM_SECRET%%/${SYNAPSE_FORM_SECRET}/'
 	echo ${SYNAPSE_SIGNING_KEY} > config/synapse/synapse.signing.key
-	sed 's/%%SSH_PUBKEY%%/${SSH_PUBKEY}/; s/%%POSTGRES_PASSWORD%%/${POSTGRES_PASSWORD}/' config.yaml \
-		| fcct --files-dir config --strict --output config.ign
+	sed 's/%%SSH_PUBKEY%%/${SSH_PUBKEY}/' config.yaml | fcct --files-dir config --strict --output config.ign
