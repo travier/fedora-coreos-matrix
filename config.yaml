@@ -125,7 +125,7 @@ systemd:
       contents: |
         [Unit]
         Description=Run certbot to get certificates from Let's Encrypt
-        ConditionPathExists=!/var/srv/letsencrypt-certs/archive
+        ConditionPathExists=!/var/srv/matrix/letsencrypt-certs/archive
         After=podmanpod.service network-online.target nginx-http.service
         Wants=network-online.target
         Requires=podmanpod.service nginx-http.service
@@ -203,7 +203,7 @@ systemd:
       contents: |
         [Unit]
         Description=Let's Encrypt certificate renewal
-        ConditionPathExists=/var/srv/letsencrypt-certs/archive
+        ConditionPathExists=/var/srv/matrix/letsencrypt-certs/archive
         After=podmanpod.service network-online.target nginx-http.service
         Wants=network-online.target
         Requires=podmanpod.service nginx-http.service

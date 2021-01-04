@@ -155,7 +155,7 @@ See this example to dump the current database and import it in the new version:
 $ systemctl stop synapse
 
 # Dump the database
-$ mkdir /var/srv/postgres.dump
+$ mkdir /var/srv/matrix/postgres.dump
 $ cat /etc/postgresql_synapse
 $ podman run --read-only --pod=matrix --rm \
       --tty --interactive \
