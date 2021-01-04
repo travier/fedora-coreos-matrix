@@ -69,7 +69,7 @@ systemd:
                                   -v /var/srv/matrix/postgres:/var/lib/postgresql/data:z \
                                   docker.io/library/postgres:13 \
                                   -c listen_addresses='*'
-        ExecStop=/bin/podman rm -f postgres
+        ExecStop=/bin/podman rm --force --ignore postgres
 
         [Install]
         WantedBy=multi-user.target
@@ -91,7 +91,7 @@ systemd:
                                   --rm \
                                   -v /var/srv/matrix/synapse:/data:z \
                                   docker.io/matrixdotorg/synapse:latest
-        ExecStop=/bin/podman rm -f synapse
+        ExecStop=/bin/podman rm --force --ignore synapse
 
         [Install]
         WantedBy=multi-user.target
@@ -116,7 +116,7 @@ systemd:
                                   --volume /var/srv/matrix/letsencrypt-certs:/etc/letsencrypt:ro,z \
                                   --volume /var/srv/matrix/well-known:/var/well-known:ro,z \
                                   docker.io/nginx:stable
-        ExecStop=/bin/podman rm -f nginx
+        ExecStop=/bin/podman rm --force --ignore nginx
 
         [Install]
         WantedBy=multi-user.target
@@ -155,7 +155,7 @@ systemd:
                                   --volume /var/srv/matrix/letsencrypt-webroot:/var/www:ro,z \
                                   --volume /var/srv/matrix/nginx-http/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   docker.io/nginx:stable
-        ExecStop=/bin/podman rm -f nginx-http
+        ExecStop=/bin/podman rm --force --ignore nginx-http
 
         [Install]
         WantedBy=multi-user.target
@@ -176,7 +176,7 @@ systemd:
                                   --volume /var/srv/matrix/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z \
                                   --volume /var/srv/matrix/element-web/config.json:/app/config.json:ro,z \
                                   docker.io/vectorim/element-web:latest
-        ExecStop=/bin/podman rm -f element-web
+        ExecStop=/bin/podman rm --force --ignore element-web
 
         [Install]
         WantedBy=multi-user.target
