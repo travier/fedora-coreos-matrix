@@ -30,7 +30,7 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
-    - name: podmanpod.service
+    - name: matrixpod.service
       enabled: true
       contents: |
         [Unit]
@@ -51,9 +51,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the database service for matrix
-        After=podmanpod.service network-online.target
+        After=matrixpod.service network-online.target
         Wants=network-online.target
-        Requires=podmanpod.service
+        Requires=matrixpod.service
 
         [Service]
         EnvironmentFile=/etc/postgresql_synapse
@@ -79,9 +79,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the synapse service.
-        After=podmanpod.service network-online.target
+        After=matrixpod.service network-online.target
         Wants=network-online.target
-        Requires=podmanpod.service
+        Requires=matrixpod.service
 
         [Service]
         ExecStart=/bin/podman run --name=synapse \
@@ -100,9 +100,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the nginx server
-        After=podmanpod.service network-online.target certbot-firstboot.service
+        After=matrixpod.service network-online.target certbot-firstboot.service
         Wants=network-online.target
-        Requires=podmanpod.service certbot-firstboot.service
+        Requires=matrixpod.service certbot-firstboot.service
 
         [Service]
         ExecStartPre=/bin/podman pull docker.io/nginx:stable
@@ -126,9 +126,9 @@ systemd:
         [Unit]
         Description=Run certbot to get certificates from Let's Encrypt
         ConditionPathExists=!/var/srv/matrix/letsencrypt-certs/archive
-        After=podmanpod.service network-online.target nginx-http.service
+        After=matrixpod.service network-online.target nginx-http.service
         Wants=network-online.target
-        Requires=podmanpod.service nginx-http.service
+        Requires=matrixpod.service nginx-http.service
 
         [Service]
         Type=oneshot
@@ -148,9 +148,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the nginx HTTP server for Let's Encrypt bootstrap
-        After=podmanpod.service network-online.target
+        After=matrixpod.service network-online.target
         Wants=network-online.target
-        Requires=podmanpod.service
+        Requires=matrixpod.service
 
         [Service]
         # Pull the image in ExecStartPre for more accurate startup dependency tracking
@@ -170,9 +170,9 @@ systemd:
       contents: |
         [Unit]
         Description=Run the element-web container
-        After=podmanpod.service network-online.target
+        After=matrixpod.service network-online.target
         Wants=network-online.target
-        Requires=podmanpod.service
+        Requires=matrixpod.service
 
         [Service]
         ExecStart=/bin/podman run --name=element-web \
@@ -204,9 +204,9 @@ systemd:
         [Unit]
         Description=Let's Encrypt certificate renewal
         ConditionPathExists=/var/srv/matrix/letsencrypt-certs/archive
-        After=podmanpod.service network-online.target nginx-http.service
+        After=matrixpod.service network-online.target nginx-http.service
         Wants=network-online.target
-        Requires=podmanpod.service nginx-http.service
+        Requires=matrixpod.service nginx-http.service
 
         [Service]
         Type=oneshot
