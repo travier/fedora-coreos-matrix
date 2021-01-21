@@ -36,7 +36,7 @@ systemd:
         [Unit]
         Description=Creates a podman pod to run the matrix services.
         After=cgroups-v2-karg.service network-online.target
-        Wants=After=cgroups-v2-karg.service network-online.target
+        Wants=cgroups-v2-karg.service network-online.target
 
         [Service]
         Type=oneshot
