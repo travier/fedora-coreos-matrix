@@ -59,6 +59,12 @@ A template version of the generated `homeserver.yaml` is included in
 
 First we want to replace the secrets with values that were generated for you by
 Synapse.
+Note that the generated secrets may contain characters which are currently not
+handled well by the Makefile. Problematic characters include `&` and `#` and
+possibly others. Always manually verify that the final config files contain
+the correct secrets.
+See [isssue #14](https://github.com/travier/fedora-coreos-matrix/issues/14)
+for details.
 
 In the `secrets` file, edit the following variables:
 
