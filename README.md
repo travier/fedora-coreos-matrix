@@ -1,6 +1,7 @@
-# Fedora CoreOS Config to host a Matrix homeserver
+# Butane config to host a Matrix homeserver on Fedora CoreOS
 
-Example Fedora CoreOS config to host a Matrix homeserver. This will setup:
+Example Butane config to host a Matrix homeserver on Fedora CoreOS. This will
+setup:
   * nginx with Let's Encrypt for HTTPS support
   * Synapse with PostgreSQL and elements-web
 
@@ -106,7 +107,7 @@ days, between 2 AM and 4 AM UTC, which is a timeframe where reboots should have
 the least user impact on the service. Make sure to pick the correct time for
 your timezone as Fedora CoreOS uses the UTC timezone by default.
 
-See this example config that you can append to `config.yaml`:
+See this example config that you can append to `config.bu`:
 
 ```
 [updates]
