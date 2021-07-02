@@ -178,8 +178,8 @@ systemd:
             --conmon-pidfile %t/container-nginx-http.pid \
             --cidfile %t/container-nginx-http.ctr-id \
             --cgroups=no-conmon -d --replace \
-            --rm \
             --pull=always \
+            --rm \
             --read-only \
             --pod=matrix \
             --name=nginx-http \
@@ -213,8 +213,8 @@ systemd:
             --conmon-pidfile %t/container-element-web.pid \
             --cidfile %t/container-element-web.ctr-id \
             --cgroups=no-conmon -d --replace \
-            --rm \
             --pull=always \
+            --rm \
             --read-only \
             --pod=matrix \
             --name=element-web \
