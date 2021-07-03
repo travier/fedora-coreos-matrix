@@ -20,10 +20,9 @@ If you already have certificates from Let's Encrypt or another provider, see
 the [in progress PR](https://github.com/travier/fedora-coreos-matrix/pull/10)
 for an alternative with existing certificates.
 
-
 ## How to use
 
-To generate the Ignition configs, you need `make` and `fcct`.
+To generate the Ignition configs, you need `make` and [Butane][butane]:
 
 Then, you need to provide values for each variable in the secrets file:
 
@@ -202,3 +201,4 @@ $ rm -rf /var/srv/matrix/postgres.dump /var/srv/matrix/postgres.bak
 [deploy]: https://docs.fedoraproject.org/en-US/fedora-coreos/getting-started/
 [plugins]: https://certbot.eff.org/docs/using.html#dns-plugins
 [updates]: https://coreos.github.io/zincati/usage/updates-strategy/#periodic-strategy
+[butane]: https://coreos.github.io/butane/getting-started/#getting-butane
