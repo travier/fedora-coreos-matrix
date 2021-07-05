@@ -74,6 +74,7 @@ In the `secrets` file, edit the following variables:
   `homeserver.yaml`
 - `SYNAPSE_FORM_SECRET`, with the content of `form_secret` in `homeserver.yaml`
 - `SYNAPSE_SIGNING_KEY`, with the content of `my.matrix.host.signing.key`
+- `SYNAPSE_REGISTRATION`, whether or not to enable open registration
 
 ```
 SSH_PUBKEY="ssh-rsa AAAA..."
@@ -84,6 +85,7 @@ SYNAPSE_REGISTRATION_SHARED_SECRET=a_very_long_string_generated_by_synapse
 SYNAPSE_MACAROON_SECRET_KEY=a_very_long_string_generated_by_synapse
 SYNAPSE_FORM_SECRET=a_very_long_string_generated_by_synapse
 SYNAPSE_SIGNING_KEY=a_key_generated_by_synapse
+SYNAPSE_REGISTRATION=false
 ```
 
 If you wish to change other Synapse settings you can edit directly
@@ -135,8 +137,12 @@ Ignition config to deploy a Fedora CoreOS instance on your prefered platform.
 
 ## Registering new users
 
-Registration is disabled by default to avoid issues. You can login to the
-server and add accounts with:
+Registration is disabled by default for security and to avoid mistakes. If you
+want to create an instance with open registration, you can set the
+`SYNAPSE_REGISTRATION` value to `true` in your `secrets` file.
+
+Otherwise, you can still add accounts to an instance by running the following
+command directly on the server:
 
 ```
 $ sudo podman run --rm --tty --interactive \
