@@ -11,5 +11,6 @@ all:
 	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_REGISTRATION_SHARED_SECRET%%/${SYNAPSE_REGISTRATION_SHARED_SECRET}/'
 	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_MACAROON_SECRET_KEY%%/${SYNAPSE_MACAROON_SECRET_KEY}/'
 	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_FORM_SECRET%%/${SYNAPSE_FORM_SECRET}/'
+	find config/ -type f -print0 | xargs -0 sed -i 's/%%SYNAPSE_REGISTRATION%%/${SYNAPSE_REGISTRATION}/'
 	echo ${SYNAPSE_SIGNING_KEY} > config/synapse/synapse.signing.key
 	sed 's|%%SSH_PUBKEY%%|${SSH_PUBKEY}|' config.bu | butane --files-dir config --strict --output config.ign
