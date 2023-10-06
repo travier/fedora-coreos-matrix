@@ -25,7 +25,7 @@ database:
     user: synapse
     password: %%POSTGRES_PASSWORD%%
     database: synapse
-    host: localhost
+    host: 10.89.1.30
     cp_min: 5
     cp_max: 10
 log_config: "/data/synapse.log.config"

@@ -1,0 +1,27 @@
+[Unit]
+Description=Caddy web server
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=caddy
+NoNewPrivileges=true
+Image=docker.io/library/caddy:2
+PublishPort=80:80/tcp
+PublishPort=443:443/tcp
+PublishPort=443:443/udp
+PublishPort=8448:8448/tcp
+ReadOnly=true
+Volume=/var/srv/matrix/caddy/config:/config:z
+Volume=/var/srv/matrix/caddy/data:/data:z
+Volume=/var/srv/matrix/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,z
+AutoUpdate=registry
+Network=matrix.network
+IP=10.89.1.10
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

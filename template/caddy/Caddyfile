@@ -1,0 +1,30 @@
+%%DOMAIN_NAME%% {
+	respond /.well-known/matrix/server <<JSON
+	  {
+	    "m.server": "matrix.%%DOMAIN_NAME%%"
+	  }
+	  JSON 200
+	respond /.well-known/matrix/client <<JSON
+	  {
+	    "m.homeserver": {
+	      "base_url": "https://matrix.%%DOMAIN_NAME%%"
+	    },
+	    "m.identity_server": {
+	      "base_url": "https://vector.im"
+	    }
+	  }
+	  JSON 200
+}
+
+chat.%%DOMAIN_NAME%% {
+	reverse_proxy 10.89.1.40:8080
+}
+
+https://matrix.%%DOMAIN_NAME%%:8448 {
+	reverse_proxy /_matrix/* 10.89.1.20:8008
+}
+
+matrix.%%DOMAIN_NAME%% {
+	reverse_proxy /_matrix/* 10.89.1.20:8008
+	reverse_proxy /_synapse/client/* 10.89.1.20:8008
+}

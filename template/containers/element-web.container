@@ -1,0 +1,21 @@
+[Unit]
+Description=Element (Matrix web client)
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=element-web
+NoNewPrivileges=true
+Image=docker.io/vectorim/element-web:latest
+Volume=/var/srv/matrix/element-web/nginx.conf:/etc/nginx/nginx.conf:ro,z
+Volume=/var/srv/matrix/element-web/config.json:/app/config.json:ro,z
+AutoUpdate=registry
+Network=matrix.network
+IP=10.89.1.40
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
