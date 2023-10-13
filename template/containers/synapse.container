@@ -1,0 +1,21 @@
+[Unit]
+Description=Synapse (Matrix homeserver)
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=synapse
+NoNewPrivileges=true
+Image=docker.io/matrixdotorg/synapse:latest
+ReadOnly=true
+Volume=/var/srv/matrix/synapse:/data:z
+AutoUpdate=registry
+Network=matrix.network
+IP=10.89.1.20
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

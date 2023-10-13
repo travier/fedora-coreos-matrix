@@ -1,6 +1,6 @@
 /secrets
 
-/config
+/config.tmp
 /config*.ign
 
 /generated

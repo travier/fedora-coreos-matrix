@@ -1,0 +1,24 @@
+[Unit]
+Description=PostgreSQL
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=postgresql
+NoNewPrivileges=true
+Image=docker.io/library/postgres:15
+ReadOnly=true
+Tmpfs=/run
+Volume=/var/srv/matrix/postgresql/data:/var/lib/postgresql/data:z
+EnvironmentFile=/var/srv/matrix/postgresql/env
+Exec=-c listen_addresses='*'
+AutoUpdate=registry
+Network=matrix.network
+IP=10.89.1.30
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
