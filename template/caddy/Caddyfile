@@ -1,3 +1,19 @@
+{
+	# Only renew certificates once a week
+	renew_interval 7d
+	# Disable admin interface
+	admin off
+	# Only use the explicitly provided config
+	persist_config off
+	# Set email for Let's Encrypt
+	email %%EMAIL%%
+	# Use the staging endpoint to get certificates by default
+	# Remove once ready to go to production
+	acme_ca "https://acme-staging-v02.api.letsencrypt.org/directory"
+	# Only use certificates from Let's Encrypt by default
+	cert_issuer acme
+}
+
 %%DOMAIN_NAME%% {
 	respond /.well-known/matrix/server <<JSON
 	  {
