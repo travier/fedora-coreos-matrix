@@ -208,3 +208,7 @@ $ rm -rf /var/srv/matrix/postgres.dump /var/srv/matrix/postgres.bak
 [plugins]: https://certbot.eff.org/docs/using.html#dns-plugins
 [updates]: https://coreos.github.io/zincati/usage/updates-strategy/#periodic-strategy
 [butane]: https://coreos.github.io/butane/getting-started/#getting-butane
+
+## License
+
+See [LICENSE](LICENSE) or [CC0](https://creativecommons.org/public-domain/cc0/).
